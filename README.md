@@ -12,3 +12,5 @@ scan so one can perform realtime adjustments on the setup.
 It requires a running ```quakesrctrl``` control system instance attached
 to the MQTT broker to fetch information and to perform control operations
 
+An optional configuration file (example see ```doc``` folder) can be 
+put into ```~/.config/quasemrfscangui.cfg```.
