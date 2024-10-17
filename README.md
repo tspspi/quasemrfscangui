@@ -12,5 +12,25 @@ scan so one can perform realtime adjustments on the setup.
 It requires a running ```quakesrctrl``` control system instance attached
 to the MQTT broker to fetch information and to perform control operations
 
-An optional configuration file (example see ```doc``` folder) can be 
-put into ```~/.config/quasemrfscangui.cfg```.
+## Installation
+
+```
+pip install --upgrade quasemrfscangui-tspspi
+```
+
+## Configuration file
+
+An optional configuration file can be put into ```~/.config/quasemrfscangui.cfg```.
+This file supplies MQTT broker configuration and default spans
+
+```
+{
+	"broker" : {
+		"broker" : "198.51.100.1",
+		"user" : "exampleuser",
+		"port" : 1883,
+		"password" : "putyourbrokersecrethere",
+		"basetopic" : "quasem/experiment"
+	}
+}
+```
