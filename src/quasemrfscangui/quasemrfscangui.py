@@ -222,11 +222,6 @@ class RFScanGUI:
                 ax.ticklabel_format(useOffset = False)
                 self._figure_enddraw('realtimeNoise')
 
-
-
-
-
-
     def _init_figure(self, canvasName, xlabel, ylabel, title, grid=True, legend=False):
         figTemp = Figure()
         fig = Figure(figsize = ( self._plotsize[0] / figTemp.get_dpi(), self._plotsize[1] / figTemp.get_dpi()) )
