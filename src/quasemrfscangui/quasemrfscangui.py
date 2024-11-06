@@ -43,6 +43,11 @@ class RFScanGUI:
 
         self._data_i_beam, self._data_q_beam = np.full((self._lastsamples_iq,), None), np.full((self._lastsamples_iq,), None)
         self._data_amp_beam, self._data_phase_beam = np.full((self._lastsamples_iqamp,), None), np.full((self._lastsamples_iqamp,), None)
+
+        self._data_i_noise, self._data_q_noise, self._data_i_noise_beam, self._data_q_noise_beam = np.full((self._lastsamples_iqamp,), None), np.full((self._lastsamples_iqamp,), None), np.full((self._lastsamples_iqamp,), None), np.full((self._lastsamples_iqamp,), None)
+
+
+
 #
 #
 #
@@ -93,6 +98,9 @@ class RFScanGUI:
                             ]
 
                         ]),
+                        sg.Tab('Realtime noise data', [
+                            [ sg.Canvas(size=self._plotsize, key='canvRealtimeNoise') ]
+                        ]),
                         sg.Tab('Last complete RF scan', [
 
                         ])
@@ -112,7 +120,8 @@ class RFScanGUI:
 
         self._figures = {
             'realtimeIQ' : self._init_figure('canvRealtimeIQ', "Samples [arb]", "I/Q voltage [uV]", "I/Q samples", grid=True, legend=True),
-            'realtimeAmp' : self._init_figure('canvRealtimeIQAmp', "Samples [arb]", "I/Q amplitude [uV]", "I/Q samples", grid=True, legend=True)
+            'realtimeAmp' : self._init_figure('canvRealtimeIQAmp', "Samples [arb]", "I/Q amplitude [uV]", "I/Q samples", grid=True, legend=True),
+            'realtimeNoise' : self._init_figure('canvRealtimeNoise', "Samples [arb]", "Noise [uV]", "Noise", grid=True, legend=True),
         }
 
         while True:
@@ -140,6 +149,11 @@ class RFScanGUI:
 
                 self._data_i_beam, self._data_q_beam = np.full((self._lastsamples_iq,), None), np.full((self._lastsamples_iq,), None)
                 self._data_amp_beam, self._data_phase_beam = np.full((self._lastsamples_iqamp,), None), np.full((self._lastsamples_iqamp,), None)
+
+                self._data_i_noise, self._data_q_noise, self._data_i_noise_beam, self._data_q_noise_beam = np.full((self._lastsamples_iqamp,), None), np.full((self._lastsamples_iqamp,), None), np.full((self._lastsamples_iqamp,), None), np.full((self._lastsamples_iqamp,), None)
+
+
+
 #                print(f"Updated sizes: {self._data_i.shape}, {self._data_amp.shape}")
  
                 if len(old_i) > self._lastsamples_iq:
@@ -198,6 +212,17 @@ class RFScanGUI:
 #                ax.plot(xaxis, self._data_q_beam, label = "Q (beam)")
                 ax.ticklabel_format(useOffset = False)
                 self._figure_enddraw('realtimeAmp')
+
+                ax = self._figure_begindraw('realtimeNoise')
+                xaxis = np.linspace(0, len(self._data_i_noise), len(self._data_i_noise))
+                ax.plot(xaxis, self._data_i_noise, label = "I (no beam)")
+                ax.plot(xaxis, self._data_q_noise, label = "Q (no beam)")
+                ax.plot(xaxis, self._data_i_noise_beam, label = "I (beam)")
+                ax.plot(xaxis, self._data_q_noise_beam, label = "Q (beam)")
+                ax.ticklabel_format(useOffset = False)
+                self._figure_enddraw('realtimeNoise')
+
+
 
 
 
@@ -283,6 +308,11 @@ class RFScanGUI:
             self._data_amp = np.roll(self._data_amp, -1)
             self._data_amp_beam[-1] = np.sqrt(msg["I"]**2 + msg["Q"]**2)
             self._data_amp[-1] = None
+
+            self._data_i_noise_beam = np.roll(self._data_i_noise_beam, -1)
+            self._data_q_noise_beam = np.roll(self._data_q_noise_beam, -1)
+            self._data_i_noise = np.roll(self._data_i_noise, -1)
+            self._data_q_noise = np.roll(self._data_q_noise, -1)
         else:
             self._data_i = np.roll(self._data_i, -1)
             self._data_q = np.roll(self._data_q, -1)
@@ -297,7 +327,15 @@ class RFScanGUI:
             self._data_amp_beam = np.roll(self._data_amp_beam, -1)
             self._data_amp[-1] = np.sqrt(msg["I"]**2 + msg["Q"]**2)
             self._data_amp_beam[-1] = None
- 
+
+            self._data_i_noise_beam = np.roll(self._data_i_noise_beam, -1)
+            self._data_q_noise_beam = np.roll(self._data_q_noise_beam, -1)
+            self._data_i_noise = np.roll(self._data_i_noise, -1)
+            self._data_q_noise = np.roll(self._data_q_noise, -1)
+           
+        self._data_i_noise[-1], self._data_q_noise[-1] = np.nanstd(self._data_i[-10:].astype(float)), np.nanstd(self._data_q[-10:].astype(float))
+        self._data_i_noise_beam[-1], self._data_q_noise_beam[-1] = np.nanstd(self._data_i_beam[-10:].astype(float)), np.nanstd(self._data_q_beam[-10:].astype(float))
+
 
         self._updateGraphs = True
 
